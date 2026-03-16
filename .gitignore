@@ -22,6 +22,9 @@ export/
 *.png
 *.jpg
 *.jpeg
+# 允許 results/ 內截圖納入版控（README / 報告用）
+!results/*.png
+!results/*.jpg
 
 # IDE / 編輯器
 .vscode/

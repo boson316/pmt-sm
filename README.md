@@ -1,10 +1,12 @@
 ## PMT-SM: Progressive Makeup Transfer via Spatial-Style GAN
 
+[![CI](https://github.com/boson316/pmt-sm/actions/workflows/ci.yml/badge.svg)](https://github.com/boson316/pmt-sm/actions)  
 [![Gradio Demo](https://img.shields.io/badge/Gradio-demo-00b894?logo=gradio&logoColor=white)](#-gradio-demo)  
 [![TensorRT NVIDIA](https://img.shields.io/badge/TensorRT-NVIDIA-1f6feb?logo=nvidia&logoColor=white)](#-nvidia--tensorrt-deployment)  
 [![FID 7.93](https://img.shields.io/badge/FID-7.93-2ecc71)](#-results--metrics)
 
-> 臉部妝容轉移 / Face Makeup Transfer · StyleGAN2-ADA · ViT-FPN · TensorRT · Jetson · NVIDIA AI · CLIP
+> 臉部妝容轉移 / Face Makeup Transfer · StyleGAN2-ADA · ViT-FPN · TensorRT · Jetson · NVIDIA AI · CLIP  
+> **Repo topics**（於 GitHub 倉庫設定）：`makeup-transfer` `stylegan2` `tensorrt` `gradio` `vit` `nvidia-jetson`
 
 ---
 
@@ -33,11 +35,15 @@ flowchart LR
 - **Deployment**：ONNX、TensorRT (`torch2trt`)、Jetson-friendly pipeline  
 - **工具鏈 Tooling**：PyTorch, CUDA, Windows / WSL, Gradio, TorchMetrics, LPIPS, InsightFace
 
-**Pipeline 步驟（並排）| Pipeline Steps**
+**Pipeline 步驟 | Pipeline Steps**
 
-| Step1 | Step2 | Step3 | Step4 | Step5 | Step6 | Step7 |
-|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
-| ViT-FPN | MFL Landmark Encoder | StyleGAN2-ADA FFHQ | Latent Regression | PMT-SM Full Training | ONNX / TensorRT Export | Eval & Gradio App |
+- Step1：ViT-FPN  
+- Step2：MFL Landmark Encoder  
+- Step3：StyleGAN2-ADA FFHQ  
+- Step4：Latent Regression  
+- Step5：PMT-SM Full Training  
+- Step6：ONNX / TensorRT Export  
+- Step7：Eval & Gradio App  
 
 ---
 
@@ -73,7 +79,7 @@ python app_gradio.py
 ```
 
 啟動後在瀏覽器開啟終端機顯示的網址（如 `http://127.0.0.1:7860`），上傳 **Source Face / Target Makeup**，即可預覽 **Progressive Makeup Transfer**。  
-Open the printed URL (e.g. `http://127.0.0.1:7860`) and upload **Source Face / Target Makeup** to preview **progressive makeup transfer**.
+**Demo 升級**：可將 `app_gradio.py` 部署至 [Hugging Face Spaces](https://huggingface.co/spaces) 取得免費線上 Demo，並在 README 頂部將 Gradio badge 連結改為該 Space URL。
 
 ---
 
@@ -122,25 +128,38 @@ Open the printed URL (e.g. `http://127.0.0.1:7860`) and upload **Source Face / T
 
 ---
 
-### 專案結構樹 | Project Structure
+### 專案結構樹 | Project Structure (ML 最佳實踐)
 
-```bash
-pmt-sm-day1/
-├─ app_gradio.py
-├─ train_pmt_sm.py
-├─ train_pmt_sm_fast.py
-├─ pmt_sm_infer_demo.py
-├─ export_trt.py
-├─ eval_pmt_sm.py
-├─ report.md
-├─ README.md
-├─ stylegan2-ada-pytorch/        # submodule / external repo
-├─ pretrained/
-│  └─ ffhq.pkl                   # StyleGAN2-ADA FFHQ weights (not included)
-├─ pmt_sm_ckpt/                  # training checkpoints (gitignored)
-├─ pairs_demo/                   # eval image pairs (optional)
-├─ *.png                         # demo figures (gitignored or lightweight)
-└─ .gitignore
+```text
+pmt-sm/
+├── README.md
+├── requirements.txt
+├── pyproject.toml
+├── docs/
+│   ├── architecture.md          # ViT-FPN + MFL 深度解析
+│   └── ablation.md              # 消融實驗
+├── notebooks/
+│   └── 01_vit_fpn.ipynb         # Jupyter 學習
+├── src/pmt_sm/
+│   ├── __init__.py
+│   ├── train.py
+│   └── models/
+├── tests/
+│   └── test_smoke.py            # pytest
+├── .github/workflows/
+│   └── ci.yml                   # GitHub Actions CI
+├── app_gradio.py
+├── train_pmt_sm.py
+├── train_pmt_sm_fast.py
+├── pmt_sm_infer_demo.py
+├── export_trt.py
+├── eval_pmt_sm.py
+├── report.md
+├── stylegan2-ada-pytorch/
+├── pretrained/
+│   └── ffhq.pkl                 # (not included)
+├── pmt_sm_ckpt/
+└── .gitignore
 ```
 
 ---
