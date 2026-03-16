@@ -98,6 +98,8 @@ python app_gradio.py
 - **FID**：生成品質與真實分佈距離。  
 - **BSR (Beauty Similarity Ratio)**：A/B test 風格偏好比率（美妝相似度）。  
 - **Inference 45 ms**：在 TensorRT FP16 環境下，單張 512×512 臉部圖像推論延遲約 45 ms（視 GPU 而定）。
+- **生成臉孔分佈**：目前使用 FFHQ 預訓練 Generator，生成結果會偏向該資料集分佈（多為西方臉孔）；若需亞洲人臉為主，請改用亞洲臉資料集訓練或 fine-tune Generator / encoder。  
+  **Output distribution**: The pretrained FFHQ Generator biases outputs toward Western faces; for Asian-facing results, train or fine-tune G/encoder on Asian face datasets.
 
 ---
 
@@ -216,8 +218,8 @@ For Linux/WSL/Jetson, install the same packages with appropriate CUDA/cuDNN whee
   **Not included**: `pretrained/ffhq.pkl`, `pmt_sm_ckpt/*.pt`, personal face images.
 - 若在 Windows 上缺少 MSVC / CUDA build tool，建議先使用 **latent-only** 模式（`train_pmt_sm_fast.py`），避免 StyleGAN2 自訂 CUDA kernel 編譯失敗。  
 - 請遵守各資料集與第三方模型的授權與隱私條款（FFHQ、ArcFace、MediaPipe 等）。
-
-
+- **FFHQ 臉孔分佈**：目前使用 FFHQ 預訓練 Generator，生成結果會偏向西方臉孔；若需亞洲人臉為主，請改用亞洲臉資料集訓練或 fine-tune Generator / encoder。  
+  **FFHQ face bias**: Outputs are biased toward the FFHQ distribution; for Asian-facing demos, use Asian face datasets for training or fine-tuning.
 
 ### 致謝 | Acknowledgements
 

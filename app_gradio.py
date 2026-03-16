@@ -86,25 +86,32 @@ def run_pmt_sm(
     tgt_img: Image.Image | None,
     pose_img: Image.Image | None,
 ):
+    """
+    Windows 友善版：
+    - 若圖片能生成，一定顯示圖像
+    - Metrics 若計算失敗，只顯示說明文字，不影響圖像輸出
+    """
     if src_img is None:
-        return None, None, "請先上傳源臉圖片。"
+        return None, "請先上傳源臉圖片。", "請先上傳源臉圖片。"
 
-    # 1) 預處理
-    src_t = TRANSFORM(src_img).unsqueeze(0).to(device)
-    if tgt_img is not None:
-        tgt_t = TRANSFORM(tgt_img).unsqueeze(0).to(device)
-    else:
-        tgt_t = None
+    # 1) Encoder + StyleGAN2 解碼
+    try:
+        src_t = TRANSFORM(src_img).unsqueeze(0).to(device)
+        num_landmarks = 468
+        lm = torch.zeros(1, num_landmarks, 2, device=device)
 
-    # TODO: 這裡 landmarks 先用 dummy，之後可從 MediaPipe / pose_img 補上
-    num_landmarks = 468
-    lm = torch.zeros(1, num_landmarks, 2, device=device)
+        with torch.no_grad():
+            pred_w, _, _ = MODEL(src_t, lm, w_gt=None, use_decode=False)
+            recon = MODEL.decode(pred_w).clamp(0, 1)
+    except Exception as e:  # noqa: BLE001
+        err_msg = str(e)
+        hint = (
+            "推論失敗。若錯誤訊息包含 upfirdn2d / CUDA kernel，代表 Windows 上 StyleGAN2 G.synthesis "
+            "需要編譯自訂 CUDA，建議改在 WSL / Linux / Jetson 上執行，或僅使用 export_trt 匯出 Encoder。"
+        )
+        return None, f"Metrics 無法計算（推論失敗）\n錯誤: {err_msg}\n\n{hint}", f"錯誤: {err_msg}"
 
-    with torch.no_grad():
-        pred_w, _, _ = MODEL(src_t, lm, w_gt=None, use_decode=False)
-        recon = MODEL.decode(pred_w).clamp(0, 1)
-
-    # 轉回 PIL 方便顯示
+    # 2) 轉成 PIL 顯示
     def to_pil(t: torch.Tensor) -> Image.Image:
         x = t[0].permute(1, 2, 0).detach().cpu().numpy()
         x = (x * 255.0).clip(0, 255).astype("uint8")
@@ -112,24 +119,29 @@ def run_pmt_sm(
 
     recon_pil = to_pil(recon)
 
-    # 2) metrics（簡易版）
-    metrics_txt = []
-    if tgt_t is not None and SSIM_METRIC is not None:
-        with torch.no_grad():
-            # 尺度對齊
-            r = F.interpolate(recon, size=tgt_t.shape[-2:], mode="area")
-            ssim_val = SSIM_METRIC(r, tgt_t).item()
-        metrics_txt.append(f"SSIM={ssim_val:.3f}")
+    # 3) Metrics：如有目標圖且模組存在則嘗試計算，失敗就略過
+    metrics_txt: list[str] = []
 
-    if tgt_t is not None and LPIPS_METRIC is not None:
-        with torch.no_grad():
-            lp = LPIPS_METRIC(
-                (recon * 2 - 1), (tgt_t * 2 - 1)
-            ).item()  # LPIPS 期待 [-1,1]
-        metrics_txt.append(f"LPIPS={lp:.3f}")
+    if tgt_img is not None and (SSIM_METRIC is not None or LPIPS_METRIC is not None):
+        try:
+            tgt_t = TRANSFORM(tgt_img).unsqueeze(0).to(device)
+
+            with torch.no_grad():
+                r = F.interpolate(recon, size=tgt_t.shape[-2:], mode="area")
+            if SSIM_METRIC is not None:
+                with torch.no_grad():
+                    ssim_val = SSIM_METRIC(r, tgt_t).item()
+                metrics_txt.append(f"SSIM={ssim_val:.3f}")
+
+            if LPIPS_METRIC is not None:
+                with torch.no_grad():
+                    lp = LPIPS_METRIC((r * 2 - 1), (tgt_t * 2 - 1)).item()
+                metrics_txt.append(f"LPIPS={lp:.3f}")
+        except Exception as e:  # noqa: BLE001
+            metrics_txt.append(f"Metrics 計算失敗（已略過）：{e}")
 
     if not metrics_txt:
-        metrics_txt.append("（未安裝 torchmetrics / LPIPS，因此略過 SSIM/LPIPS）")
+        metrics_txt.append("目前僅示範生成效果，Metrics 可在 eval_pmt_sm.py 中離線計算。")
 
     return recon_pil, "\n".join(metrics_txt), "完成"
 
