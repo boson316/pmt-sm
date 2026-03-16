@@ -1,4 +1,4 @@
-## PMT-SM: Progressive Makeup Transfer via Spatial-Style GAN *(夏至賢老師論文實作)*
+## PMT-SM: Progressive Makeup Transfer via Spatial-Style GAN
 
 [![Gradio Demo](https://img.shields.io/badge/Gradio-demo-00b894?logo=gradio&logoColor=white)](#-gradio-demo)  
 [![TensorRT NVIDIA](https://img.shields.io/badge/TensorRT-NVIDIA-1f6feb?logo=nvidia&logoColor=white)](#-nvidia--tensorrt-deployment)  
