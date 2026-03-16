@@ -1,0 +1,30 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# 虛擬環境
+.venv/
+env/
+venv/
+
+# StyleGAN2 與預訓練權重（請自行下載）
+pretrained/
+stylegan2-ada-pytorch/pretrained/
+
+# 訓練 checkpoint 與中間結果
+pmt_sm_ckpt/
+pmt_sm_pred_w_step*.pt
+pmt_sm_eval_results.csv
+export/
+
+# 影像檔（可依需要調整。若要保留 demo 小圖，可把特定檔名移出 ignore）
+*.png
+*.jpg
+*.jpeg
+
+# IDE / 編輯器
+.vscode/
+.idea/
+*.code-workspace
+
