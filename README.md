@@ -16,7 +16,6 @@
 ---
 
 ### 核心技術棧 | Core Tech Stack（約 3 小時實作流程）
-![Day1 ViT](results/day1_vit_fpn_demo.png)
 ```mermaid
 flowchart LR
     A[Step1 ViT-FPN] --> B[Step2 MFL Landmark]
