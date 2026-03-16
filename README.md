@@ -1,4 +1,4 @@
-## PMT-SM: Progressive Makeup Transfer via Spatial-Style GAN *(夏至賢老師論文實作)*
+## PMT-SM: Progressive Makeup Transfer via Spatial-Style GAN
 
 [![Gradio Demo](https://img.shields.io/badge/Gradio-demo-00b894?logo=gradio&logoColor=white)](#-gradio-demo)  
 [![TensorRT NVIDIA](https://img.shields.io/badge/TensorRT-NVIDIA-1f6feb?logo=nvidia&logoColor=white)](#-nvidia--tensorrt-deployment)  
@@ -10,21 +10,21 @@
 
 ### 專案簡介 | Overview
 
-**中文**：PMT-SM 是一個針對臉部「漸進式妝容轉移」的研究原型，結合 **ViT-FPN + Multi-Scale Facial Landmarks + Spatial-Style GAN (StyleGAN2-ADA)**，從 Day1–Day7 帶你完成 backbone demo、latent regression 訓練、ONNX／TensorRT 匯出、評估與 Gradio Web Demo，專為 **NVIDIA GPU / Jetson** 與 **實驗室研究工作流程** 設計。  
-**English**: PMT-SM is a research prototype for **progressive face makeup transfer**, built on **ViT-FPN + multi-scale facial landmarks + Spatial-Style GAN (StyleGAN2-ADA)**. The 7-day curriculum covers backbone demos, latent regression training, ONNX/TensorRT export, evaluation, and a Gradio web demo, targeting **NVIDIA GPUs / Jetson** and **lab-grade experimentation**.
+**中文**：PMT-SM 是一個針對臉部「漸進式妝容轉移」的研究原型，結合 **ViT-FPN + Multi-Scale Facial Landmarks + Spatial-Style GAN (StyleGAN2-ADA)**，**約 3 小時內**完成從 backbone demo、latent regression 訓練、ONNX／TensorRT 匯出到評估與 Gradio Web Demo 的完整 pipeline，專為 **NVIDIA GPU / Jetson** 與 **研究原型工作流程** 設計。  
+**English**: PMT-SM is a research prototype for **progressive face makeup transfer**, built on **ViT-FPN + multi-scale facial landmarks + Spatial-Style GAN (StyleGAN2-ADA)**. The full pipeline—backbone demos, latent regression training, ONNX/TensorRT export, evaluation, and Gradio web demo—was **implemented in ~3 hours**, targeting **NVIDIA GPUs / Jetson** and **lab-grade experimentation**.
 
 ---
 
-### 核心技術棧 | Core Tech Stack (Day1–Day7)
+### 核心技術棧 | Core Tech Stack（約 3 小時實作流程）
 
 ```mermaid
 flowchart LR
-    A[Day1 ViT-FPN Demo] --> B[Day2 MFL Landmark Encoder]
-    B --> C[Day3 StyleGAN2-ADA FFHQ]
-    C --> D[Day4 Latent Regression Prototype]
-    D --> E[Day5 PMT-SM Full Training]
-    E --> F[Day6 ONNX / TensorRT Export]
-    F --> G[Day7 Eval & Gradio App]
+    A[Step1 ViT-FPN] --> B[Step2 MFL Landmark]
+    B --> C[Step3 StyleGAN2-ADA FFHQ]
+    C --> D[Step4 Latent Regression]
+    D --> E[Step5 PMT-SM Training]
+    E --> F[Step6 ONNX / TensorRT]
+    F --> G[Step7 Eval & Gradio]
 ```
 
 - **Backbone**：`ViT-FPN` (timm) + Feature Pyramid → 高解析臉部特徵  
@@ -33,11 +33,11 @@ flowchart LR
 - **Deployment**：ONNX、TensorRT (`torch2trt`)、Jetson-friendly pipeline  
 - **工具鏈 Tooling**：PyTorch, CUDA, Windows / WSL, Gradio, TorchMetrics, LPIPS, InsightFace
 
-**Day1–Day7 Demo 流程 | Demo Pipeline（並排）**
+**Pipeline 步驟（並排）| Pipeline Steps**
 
-| Day1 | Day2 | Day3 | Day4 | Day5 | Day6 | Day7 |
-|:----:|:----:|:----:|:----:|:----:|:----:|:----:|
-| ViT-FPN Demo | MFL Landmark Encoder | StyleGAN2-ADA FFHQ | Latent Regression Prototype | PMT-SM Full Training | ONNX / TensorRT Export | Eval & Gradio App |
+| Step1 | Step2 | Step3 | Step4 | Step5 | Step6 | Step7 |
+|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
+| ViT-FPN | MFL Landmark Encoder | StyleGAN2-ADA FFHQ | Latent Regression | PMT-SM Full Training | ONNX / TensorRT Export | Eval & Gradio App |
 
 ---
 
@@ -118,7 +118,7 @@ Open the printed URL (e.g. `http://127.0.0.1:7860`) and upload **Source Face / T
 | `pmt_sm_infer_demo.py` | 單張臉推論範例，輸入臉圖 → 輸出 latent *w*（`pmt_sm_pred_w_stepXX.pt`）。 | Single-face inference example, outputs latent *w* checkpoint. |
 | `eval_pmt_sm.py` | 評估 (source, target) image pairs，計算 SSIM / LPIPS / ArcFace，輸出 `pmt_sm_eval_results.csv`。 | Evaluates paired images with SSIM/LPIPS/ArcFace, logs CSV. |
 | `app_gradio.py` | Gradio Web App，提供互動式妝容轉移介面與 metrics 顯示。 | Gradio web UI for interactive makeup transfer and metrics display. |
-| `report.md` | Day7 評估與 NVIDIA 提案草稿（FID / BSR / CLIP / baseline 設計）。 | Day7 evaluation & NVIDIA proposal draft (FID/BSR/CLIP/baselines). |
+| `report.md` | 評估與 NVIDIA 提案草稿（FID / BSR / CLIP / baseline 設計）。 | Evaluation & NVIDIA proposal draft (FID/BSR/CLIP/baselines). |
 
 ---
 
@@ -139,7 +139,7 @@ pmt-sm-day1/
 │  └─ ffhq.pkl                   # StyleGAN2-ADA FFHQ weights (not included)
 ├─ pmt_sm_ckpt/                  # training checkpoints (gitignored)
 ├─ pairs_demo/                   # eval image pairs (optional)
-├─ *.png                         # Day1–Day3 demo figures (gitignored or lightweight)
+├─ *.png                         # demo figures (gitignored or lightweight)
 └─ .gitignore
 ```
 
@@ -199,15 +199,7 @@ For Linux/WSL/Jetson, install the same packages with appropriate CUDA/cuDNN whee
 - 若在 Windows 上缺少 MSVC / CUDA build tool，建議先使用 **latent-only** 模式（`train_pmt_sm_fast.py`），避免 StyleGAN2 自訂 CUDA kernel 編譯失敗。  
 - 請遵守各資料集與第三方模型的授權與隱私條款（FFHQ、ArcFace、MediaPipe 等）。
 
----
 
-### 實驗室關聯 | Lab Affiliation
-
-- **Lab**：MIT Lab, Department of Computer Science and Information Engineering, National Ilan University (國立宜蘭大學 資工系 MIT Lab)  
-- **Advisor 指導教授**：夏至賢老師 (Prof. Chih-Hsien Chsia)  
-- **Contact**：`chsia@niu.edu.tw`
-
----
 
 ### 致謝 | Acknowledgements
 
@@ -224,7 +216,7 @@ For Linux/WSL/Jetson, install the same packages with appropriate CUDA/cuDNN whee
 
 ---
 
-### 3 小時 Cursor Pro ｜ Live Demo
+### 3 小時實作 | 3-Hour Implementation
 
-> 本專案完整流程設計為 **約 3 小時內可重現**：從 Day1 Demo 到 Day7 評估與提案撰寫，全部在 Cursor Pro / VS Code 中完成，適合作為 **課程作業、學期專題或 NVIDIA 學生計畫提案範例**。  
-> Designed to be reproducible within **≈3 hours** end-to-end in Cursor Pro, suitable for coursework, semester projects, and NVIDIA student program proposals.
+> 本專案為 **約 3 小時內完成之實作**（Cursor Pro / VS Code），從 backbone、latent regression、ONNX/TensorRT 到評估與 Gradio，完整 pipeline 可於 3 小時內重現，適合作為 **課程作業、學期專題或 NVIDIA 學生計畫提案範例**。  
+> This project was **implemented in ~3 hours** (Cursor Pro / VS Code). The full pipeline—backbone, latent regression, ONNX/TensorRT, evaluation, and Gradio—can be reproduced within 3 hours; suitable for coursework, semester projects, and NVIDIA student program proposals.
